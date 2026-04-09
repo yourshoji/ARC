@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/026c837d-69ae-42e7-b393-e9d06e530972"  alt="Archery Analytics Preview" width="1100">
+</p>
+
 # Archery Performance Analytics (APA)
 v1.0 | C-Based Terminal Analytics Tool
 
@@ -29,3 +33,9 @@ mkdir build && cd build
 # 3. Configure and Compile
 cmake ..
 cmake --build .
+```
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c4ea5326-0d62-4a1f-bc7a-863aa863dd53"  alt="Archery Analytics Preview" width="1100">
+</p>
