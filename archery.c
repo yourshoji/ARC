@@ -11,6 +11,9 @@ uint16_t total_arrows = 0;
 uint16_t max_score = 0;
 uint16_t final_score = 0;
 float accuracy = 0.0f;
+const char* rating;
+
+int scanf_result;
 
 // function prototypes
 void ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
@@ -19,34 +22,58 @@ void ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
 
 int main(void)
 {
-    printf(" \n"
+    printf(" \n\033[1;31m"
         "   _____ ___________________  \n"
         "  /  _  \\\\______   \\_   ___ \\ \n"
         " /  /_\\  \\|       _/    \\  \\/ \n"
         "/    |    \\    |   \\     \\____\n"
         "\\____|__  /____|_  /\\______  / \n"
         "        \\/       \\/       \\/  \n"
-        "                            v1.0\n   "
+        "                            \033[0m v1.0\n   "
     );
 
-    printf("\nThe Accuracy Calculator For Archery.\n");
-    printf("\nPress 'Enter' To Begin!\n");
+    printf("\n \033[1;31m[ ARCHERY ACCURACY CALCULATOR ]\033[0m\n");
+    printf(" ----------------------------------------\n");
+    printf(" Use this tool to track precision across\n");
+    printf(" 5, 6, and 10-ring target configurations.\n");
+    printf(" ----------------------------------------\n");
+    printf("\n \033[1;37mPress 'Enter' to Begin\033[0m");
+
+    // printf("\nThe Accuracy Calculator For Archery.\n");
+    // printf("\nPress 'Enter' to begin!\n");
 
     getchar();
 
+    // Clearance
+    printf("\033[H\033[J");
+
     do 
     {
-        printf("[?] How Many Rings Are There On The Target (5, 6, and 10)?\n");
-        scanf("%hhu", &rings);
-        if (rings != 5 && rings != 6 && rings != 10)
+        printf("[\033[1;33m?\033[0m] Target Configuration (5, 6, or 10)?\n> ");
+        scanf_result = scanf("%hhu", &rings);
+        printf("\n");
+        if (scanf_result != 1 || (rings != 5 && rings != 6 && rings != 10))
         {
-            printf("Invalid Choice. Please Try Again.\n");
+            printf("[\033[1;31m!\033[0m] Invalid choice. Please try again.\n");
+
+            while (getchar() != '\n');
         }
 
-    } while (rings != 5 && rings != 6 && rings != 10);
+    } while (scanf_result != 1 || (rings != 5 && rings != 6 && rings != 10));
 
-    printf("[?] How Many Have You Missed?\n");
-    scanf("%hhu", &misses);
+    do
+    {
+        printf("[\033[1;33m?\033[0m] Total Missed Arrows?\n> ");
+        scanf_result = scanf("%hhu", &misses);
+        printf("\n");
+        if (scanf_result != 1)
+        {
+            printf("[\033[1;31m!\033[0m] Invalid input. Please enter a number.\n");
+
+            while (getchar() != '\n');
+        }
+
+    } while (scanf_result != 1 );
 
     // use malloc to grab the empty space big enough for the value of "rings"
     // use malloc cuz it can be over-written during runtime
@@ -54,15 +81,13 @@ int main(void)
 
     if (scores == NULL)
     {
-        printf("MALLOC Failed!\n");
+        printf("[\033[1;31m!\033[0m] Memory Allocation Failed!\n");
         return 1;
     }
      
-    printf("Memory Allocated!\n");
+    // printf("Memory Allocated!\n");
 
-    // printf("%d\n", rings);
-    // printf("Insert The Hits Seperated By Spaces (Outer -> Inner Ring): \n");
-    printf("[!] Insert The Hits Ranging From The Outer -> Inner Rings\n");
+    printf("[\033[1;33m?\033[0m] Input Hits (Outer to Inner)\n");
 
     while (counter < rings)
     {
@@ -71,16 +96,16 @@ int main(void)
         if (scanf("%hu", &scores[counter]) == 1) counter++;
         else 
         {
-            printf("Invalid input. Please enter a number.\n");
+            printf("[\033[1;31m!\033[0m] Invalid input. Please enter a number.\n");
 
             while (getchar() != '\n');
         }
     }
 
-    printf("\nAll Scores Saved!\n");
+    // printf("\nAll Scores Saved!\n");
 
     // Clearance
-    // printf("\033[H\033[J");
+    printf("\033[H\033[J");
 
     // Add Misses To Total Arrow Count
     total_arrows += misses;
@@ -90,7 +115,7 @@ int main(void)
     else if (rings == 10) ring10(&final_score, &total_arrows, &max_score);
     else
     {
-        printf("Unsupported Ring Count! Exiting.\n");
+        printf("[\033[1;31m!\033[0m] Unsupported ring count! Exiting.\n");
         free(scores);
         return 1;
     }
@@ -101,13 +126,32 @@ int main(void)
         accuracy = ((float)final_score / (float)max_score) * 100.0f;
     }
 
-    printf("\nArrow Hits: %d\n", total_arrows);
+    if (accuracy >= 90) rating = "Marksman";
+    else if (accuracy >= 75) rating = "Proficient";
+    else if (accuracy >= 50) rating = "Needs Practice";
+    else rating = "Get a Coach";
+
+    printf("\n\033[1;32m==========================================\033[0m\n");
+    printf("           PERFORMANCE SUMMARY            \n");
+    printf("\033[1;32m==========================================\033[0m\n");
+    printf("  %-20s : %u\n", "Total Arrows Shot", total_arrows);
+    // printf("  %-20s : %u\n", "Total Arrows Shot", total_arrows);
+    printf("  %-20s : %u\n", "Missed Arrows", misses);
+    printf("  %-20s : %u / %u\n", "Final Score", final_score, max_score);
+    printf("------------------------------------------\n");
+    printf("  %-20s : \033[1;33m%.2f%%\033[0m\n", "Accuracy Rating", accuracy);
+    printf("  %-20s : %s\n", "Rank", rating);
+    printf("\033[1;32m==========================================\033[0m\n");
+
+    // printf("[$] FINAL RESULT \n");
+
+    // printf("\nArrow Hits: %d\n", total_arrows);
     
-    printf("\nMax Score: %d\n", max_score);
+    // printf("\nMax Score: %d\n", max_score);
     
-    printf("\nFinal Score: %d\n", final_score);
+    // printf("\nFinal Score: %d\n", final_score);
     
-    printf("\nAccuracy: %.2f%%\n", accuracy);
+    // printf("\nAccuracy: %.2f%%\n", accuracy);
 
     // STONE FREE!
     free(scores);
@@ -120,7 +164,6 @@ void ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
 {
     for (int i=0; i < rings; i++)
     {
-        // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
@@ -135,7 +178,6 @@ void ring6(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
     // loop all the items
     for (int i=0; i < rings; i++)
     {
-        // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
@@ -149,7 +191,6 @@ void ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
 {
     for (int i=0; i < rings; i++)
     {
-        // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
