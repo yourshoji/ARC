@@ -4,17 +4,18 @@
 
 // #define MAX_SCORES 6
 uint8_t rings = 0;
-uint16_t* scores = NULL;
 uint8_t counter=0;
+uint8_t misses=0;
+uint16_t* scores = NULL;
 uint16_t total_arrows = 0;
 uint16_t max_score = 0;
 uint16_t final_score = 0;
 float accuracy = 0.0f;
 
 // function prototypes
-int ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
-int ring6(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
-int ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
+void ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
+void ring6(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
+void ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score);
 
 int main(void)
 {
@@ -33,8 +34,19 @@ int main(void)
 
     getchar();
 
-    printf("[?] How Many Rings Are There On The Target (5, 6, and 10)?\n");
-    scanf("%hhu", &rings);
+    do 
+    {
+        printf("[?] How Many Rings Are There On The Target (5, 6, and 10)?\n");
+        scanf("%hhu", &rings);
+        if (rings != 5 && rings != 6 && rings != 10)
+        {
+            printf("Invalid Choice. Please Try Again.\n");
+        }
+
+    } while (rings != 5 && rings != 6 && rings != 10);
+
+    printf("[?] How Many Have You Missed?\n");
+    scanf("%hhu", &misses);
 
     // use malloc to grab the empty space big enough for the value of "rings"
     // use malloc cuz it can be over-written during runtime
@@ -70,22 +82,19 @@ int main(void)
     // Clearance
     // printf("\033[H\033[J");
 
+    // Add Misses To Total Arrow Count
+    total_arrows += misses;
+
     if (rings == 5) ring5(&final_score, &total_arrows, &max_score);
     else if (rings == 6) ring6(&final_score, &total_arrows, &max_score);
-    else ring10(&final_score, &total_arrows, &max_score);
+    else if (rings == 10) ring10(&final_score, &total_arrows, &max_score);
+    else
+    {
+        printf("Unsupported Ring Count! Exiting.\n");
+        free(scores);
+        return 1;
+    }
 
-    // for (int i=0; i < rings; i++)
-    // {
-    //     // Find Total Arrows
-    //     total_arrows += scores[i];
-
-    //     // Find Finalized Score
-    //     final_score += scores[i] * (i + 1);
-    // }
-    
-    // // Find Max Score
-    // max_score = total_arrows * rings;
-    
     // Find Accuracy
     if (max_score > 0)
     {
@@ -107,45 +116,45 @@ int main(void)
     getchar();
 }
 
-int ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
+void ring10(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
 {
-    for (int i=0; i < 10; i++)
+    for (int i=0; i < rings; i++)
     {
         // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
         *_score += scores[i] * (i + 1);
-        // Find Max Score (10 = max score)
-        *_max_score = *_arrows * 10; 
     }
+    // Find Max Score (10 = max score)
+    *_max_score = *_arrows * 10;
 }
 
-int ring6(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
+void ring6(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
 {
     // loop all the items
-    for (int i=0; i < 6; i++)
+    for (int i=0; i < rings; i++)
     {
         // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
         *_score += scores[i] * (i + 5);
-        // Find Max Score (10 = max score)
-        *_max_score = *_arrows * 10; 
     }
+    // Find Max Score (10 = max score)
+    *_max_score = *_arrows * 10;
 }
 
-int ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
+void ring5(uint16_t* _score, uint16_t* _arrows, uint16_t* _max_score)
 {
-    for (int i=0; i < 5; i++)
+    for (int i=0; i < rings; i++)
     {
         // printf("%d", scores[i]);
         // Find Total Arrows
         *_arrows += scores[i];
         // Find Final Score
-        *_score += scores[i] * (i + 1);
-        // Find Max Score (10 = max score)
-        *_max_score = *_arrows * 5; 
+        *_score += scores[i] * (i + 6); // 6, 7, 8, 9, 10                                                             
     }
+    // Find Max Score (10 = max score)
+    *_max_score = *_arrows * 10;
 }
